@@ -43,6 +43,8 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+app.UseMiddleware<StudentManagementSystem.Middleware.ExceptionMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
