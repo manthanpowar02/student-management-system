@@ -1,4 +1,4 @@
 <Solution>
-  <Project Path="../StudentManagementSystem.Tests/StudentManagementSystem.Tests.csproj" Id="845e8cb1-0d6b-45ac-bc59-fc324acf4f0f" />
+  <Project Path="../StudentManagementSystem.Tests/StudentManagementSystem.Tests.csproj" Id="6d415bb3-6536-4ab6-b09d-d4e150ceded5" />
   <Project Path="StudentManagementSystem.csproj" />
 </Solution>
