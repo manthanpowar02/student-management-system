@@ -8,11 +8,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Explicitly load appsettings.json
-builder.Configuration
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-
+// Connection String
 var connectionString =
     builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -34,7 +30,6 @@ builder.Services.AddSwaggerGen(c =>
         Description = "REST API for managing students, courses and enrollments"
     });
 
-    // JWT Authentication Support
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "Enter JWT token like: Bearer {your token}",
@@ -63,6 +58,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 
 var jwtKey = builder.Configuration["JwtSettings:SecretKey"]!;
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -74,9 +70,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
             ValidAudience = builder.Configuration["JwtSettings:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+            IssuerSigningKey =
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
     });
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 // Global Exception Handler
@@ -99,5 +99,12 @@ app.UseAuthorization();
 
 // Controllers
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    db.Database.Migrate();
+}
 
 app.Run();
